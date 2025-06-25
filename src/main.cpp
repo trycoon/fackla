@@ -92,19 +92,11 @@ void WiFiEvent(WiFiEvent_t event) {
           }
 
           ESP_LOGI(TAG, "WiFi connected, IP: %s,  quality: %s", WiFi.localIP().toString().c_str(), quality.c_str());
-
-          #ifdef MQTT_AVAILABLE
-            connectToMqtt();
-          #endif
           break;
         }
       case SYSTEM_EVENT_STA_LOST_IP:
       case SYSTEM_EVENT_STA_DISCONNECTED:
         {
-          #ifdef MQTT_AVAILABLE
-            xTimerStop(mqttReconnectTimer, 0); // ensure we don't reconnect to MQTT while reconnecting to Wi-Fi
-          #endif
-
           ESP_LOGI(TAG, "Lost WiFi connection, trying to reconnect...");
           WiFi.begin();
           break;

@@ -37,7 +37,7 @@ inline float RandomFloat()
 
 inline double UnixTime()
 {
-    timeval tv = { 0 };
+    timeval tv = { 0, 0 };  // Initialize both tv_sec and tv_usec
     gettimeofday(&tv, nullptr);
     return (double)(tv.tv_usec / 1000000.0 + (double) tv.tv_sec);
 }
