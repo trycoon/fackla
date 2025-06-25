@@ -2,7 +2,6 @@
 #define FASTLED_INTERNAL        // Suppress build banner
 #include <FastLED.h>
 #include <WiFi.h>
-#include <ArduinoOTA.h>
 #include <esp_task_wdt.h>
 #include "esp_log.h"
 #include "settings.h"
@@ -22,33 +21,6 @@ String appName = TAG + String("_") + uniqueId;
 
 ClassicFireEffect fire(NUM_LEDS, 50, 300, 3, 2, true, false);
 auto s=millis();
-
-void OTA_setup() {
-  ArduinoOTA.onStart([]() {
-    ESP_LOGI(TAG, "ArduinoOTA start");
-  });
-  ArduinoOTA.onEnd([]() {
-    ESP_LOGI(TAG, "ArduinoOTA end");
-  });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    ESP_LOGI(TAG, "ArduinoOTA progress: %u%", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    ESP_LOGE(TAG, "ArduinoOTA error[%u]: ", error);
-
-    if (error == OTA_AUTH_ERROR) ESP_LOGE(TAG, "ArduinoOTA Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) ESP_LOGE(TAG, "ArduinoOTA Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) ESP_LOGE(TAG, "ArduinoOTA Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) ESP_LOGE(TAG, "ArduinoOTA Receive Failed");
-    else if (error == OTA_END_ERROR) ESP_LOGE(TAG, "ArduinoOTA End Failed");
-  });
-
-  ArduinoOTA.setPort(8266);
-  ArduinoOTA.setHostname(appName.c_str());
-  ArduinoOTA.setPassword(OTA_PASSWD);
-  ArduinoOTA.begin();
-  ESP_LOGI(TAG, "ArduinoOTA initialized.");
-}
 
 void watchdogSetup() {
   esp_task_wdt_init(WDT_TIMEOUT_SEC, true);
@@ -129,15 +101,11 @@ void setup()
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWD);
 
-  OTA_setup();
-
   ESP_LOGI(TAG, "Setup() done.");
 }
 
 void loop() 
 {
-  ArduinoOTA.handle();
-
   FastLED.clear();
   fire.DrawFire();
   FastLED.show(brightness);
